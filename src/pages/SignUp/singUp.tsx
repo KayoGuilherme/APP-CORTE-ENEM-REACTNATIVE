@@ -3,7 +3,7 @@ import {
   Poppins_700Bold,
 } from "@expo-google-fonts/poppins";
 import { useFonts } from "expo-font";
-import react, { useState } from "react";
+import react, { useContext, useState } from "react";
 import {
   Image,
   Keyboard,
@@ -21,6 +21,7 @@ import { MaterialIcons as Icon } from "@expo/vector-icons/";
 import { useNavigation } from "@react-navigation/native";
 import { StackPramsListAuth } from "@/routes/auth.routes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { AuthContext } from "@/context/authContext";
 
 export default function SignUp() {
   const navigation =
@@ -30,17 +31,30 @@ export default function SignUp() {
     Poppins_700Bold,
   });
 
+  const { signUp } = useContext(AuthContext);
+  const [email, setEmail] = useState("")
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-  const [isNameFocused, setIsNameFocused] = useState(false)
+  const [isNameFocused, setIsNameFocused] = useState(false);
 
-    const handleNameFocus = () => {
-      setIsNameFocused(true);
-    };
 
-    const handleNameBlur = () => {
-      setIsNameFocused(false);
-    };
+  async function handleRegister(){
+        if (email === "" || password === "" || name === "") {
+          return;
+        }
+        await signUp({ name, email, password });
+        Keyboard.dismiss();
+  }
+
+  const handleNameFocus = () => {
+    setIsNameFocused(true);
+  };
+
+  const handleNameBlur = () => {
+    setIsNameFocused(false);
+  };
 
   const handleEmailFocus = () => {
     setIsEmailFocused(true);
@@ -70,7 +84,7 @@ export default function SignUp() {
             style={styles.logo}
             source={require("../../assets/logoEnem.png")}
           />
-         
+
           <View style={styles.inputContainer}>
             <TextInput
               onFocus={handleNameFocus}
@@ -83,6 +97,8 @@ export default function SignUp() {
               ]}
               placeholder="Nome"
               placeholderTextColor="#626262"
+              value={name}
+              onChangeText={setName}
             />
 
             <TextInput
@@ -97,6 +113,8 @@ export default function SignUp() {
               placeholder="Email"
               keyboardType="email-address"
               placeholderTextColor="#626262"
+              value={email}
+              onChangeText={setEmail}
             />
 
             <TextInput
@@ -111,9 +129,11 @@ export default function SignUp() {
               placeholder="Senha"
               secureTextEntry={true}
               placeholderTextColor="#626262"
+              value={password}
+              onChangeText={setPassword}
             />
 
-            <TouchableOpacity style={styles.btn}>
+            <TouchableOpacity style={styles.btn} onPress={handleRegister}>
               <Text style={styles.textbtn}>Registrar</Text>
             </TouchableOpacity>
           </View>
@@ -127,9 +147,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    justifyContent: "center",
   },
   logo: {
-    width: 200,
+    width: 290,
     height: 200,
     resizeMode: "contain",
     alignSelf: "center",
@@ -164,6 +185,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 100,
   },
   textbtn: {
     color: "#fff",
